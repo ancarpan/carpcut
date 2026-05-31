@@ -1,0 +1,180 @@
+# ─────────────────────────────────────────────────────────────
+# CarpCut — full-feature reference example
+#
+# This YAML references the author's private media. It will NOT render
+# as-is on your machine — it exists to show how to wire up:
+#   - timed shutter SFX synced to image flicker sequences
+#   - vertical-image modes (blur_fill, pan)
+#   - video clips with start offsets and per-clip fades
+#   - audio fade-out (global tail)
+#   - camera_viewfinder overlay on the opening shot
+#
+# Treat it as a recipe book, not a runnable demo. For a runnable demo,
+# see example.yaml + make_demo_assets.py.
+# ─────────────────────────────────────────────────────────────
+
+output: my_film.mp4
+basedir: /path/to/your/media   # replace with your own directory
+audio_fade_out: 3
+
+audio:
+  - name: film_reel
+    file: film_reel_end.mp3
+    at: 0.0
+    duration: 2.0
+    volume: 0.90
+
+  - name: shutter_1
+    file: camera_shutter.mp3
+    at: 2.0
+    # full 1.431s → ends 3.431
+    volume: 0.90
+
+  - name: shutter_2
+    file: camera_shutter.mp3
+    at: 3.431
+    # full 1.431s → ends 4.862
+    volume: 0.90
+
+  - name: soundtrack
+    file: Summit_Run.mp3
+    at: 4.862
+    volume: 0.85
+
+clips:
+
+  # ── 0.000–2.000s: focus_in opening ─────────────────────────
+  - file: 20260529_125545.jpg
+    duration: 2.0
+    effect: focus_in
+    overlay: camera_viewfinder
+    fade_duration: 1.5
+
+  # ── 2.000–3.431s: 6-photo flicker #1 synced to shutter clicks ─
+  - { file: IMG-20260529-WA0025.jpg, duration: 0.275, effect: none }  # pre-click lead
+  - { file: IMG-20260529-WA0022.jpg, duration: 0.206, effect: none }  # click 1
+  - { file: IMG-20260529-WA0021.jpg, duration: 0.205, effect: none }  # click 2
+  - { file: IMG-20260529-WA0019.jpg, duration: 0.206, effect: none }  # click 3
+  - { file: IMG-20260529-WA0018.jpg, duration: 0.205, effect: none }  # click 4
+  - { file: IMG-20260529-WA0015.jpg, duration: 0.334, effect: none }  # click 5 + tail
+
+  # ── 3.431–4.862s: 6-photo flicker #2 synced to shutter clicks ─
+  - { file: 20260529_121648.jpg, duration: 0.275, effect: none }  # pre-click lead
+  - { file: 20260529_111800.jpg, duration: 0.206, effect: none }  # click 1
+  - { file: 20260529_102840.jpg, duration: 0.205, effect: none }  # click 2
+  - { file: 20260529_095234.jpg, duration: 0.206, effect: none }  # click 3
+  - { file: 20260529_095225.jpg, duration: 0.205, effect: none }  # click 4
+  - { file: 20260529_092749.jpg, duration: 0.334, effect: fade_out, fade_duration: 0.3 }  # click 5 + tail, fade to black
+
+  # ── 4.862–9.862s: drone video, source 00:10 → 00:15 ────────
+  - file: download_1780215253746.mp4
+    start: 1
+    duration: 7
+    effect: fade_in
+    fade_duration: 0.3
+
+  - file: dji_fly_20260529_100344_0116_1780083780111_video.mp4
+    start: 10
+    duration: 5
+
+  - file: dji_fly_20260529_101358_0118_1780083775979_video.mp4
+    start: 7
+    duration: 5
+
+  - file: dji_fly_20260529_100912_0117_1780083778071_video.mp4
+    start: 18
+    duration: 5
+
+  - file: dji_fly_20260529_105844_0119_1780083772713_quickshot.mp4
+    start: 3
+    duration: 3
+    effect: fade_out
+    fade_duration: 0.3
+
+  - file: 20260529_100612.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: 20260529_111800.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: 20260529_114730.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: download_1780215253746.mp4
+    start: 7
+    duration: 5
+    effect: fade_in
+    fade_duration: 0.3
+
+  - file: dji_fly_20260529_121840_0122_1780083770448_quickshot.mp4
+    effect: fade_in
+    fade_duration: 0.3
+    start: 2
+    duration: 5
+
+  - file: 20260529_121648.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: dji_fly_20260529_120604_0121_1780083769571_quickshot.mp4
+    effect: fade_in
+    fade_duration: 0.5
+
+  - file: download_1780215253746.mp4
+    start: 11
+    duration: 2
+    effect: fade_in
+    fade_duration: 0.3
+
+  - file: IMG-20260529-WA0008.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: IMG-20260529-WA0029.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: IMG-20260529-WA0030.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: IMG-20260529-WA0006.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: 20260529_130026.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: 20260529_125609.jpg
+    effect: fade_in
+    fade_duration: 0.3
+    duration: 2
+
+  - file: dji_fly_20260529_130602_0124_1780083768515_quickshot.mp4
+
+  - file: dji_fly_20260529_130708_0125_1780083767215_quickshot.mp4
+    start: 5
+    duration: 9
+
+  - file: download_1780215253746.mp4
+    start: 14
+    duration: 7
+    effect: fade_in
+    fade_duration: 0.3
+
+  - file: dji_fly_20260529_131836_0131_1780083772857_photo_beautify.jpg
+    effect: fade_out
+    fade_duration: 0.3

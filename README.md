@@ -18,6 +18,21 @@ uv run python render.py film.yaml
 uv run python render.py film.yaml --preview   # 960x540 @ 10fps, fast iteration
 ```
 
+## Try the demo
+
+```bash
+uv run python make_demo_assets.py     # one-time, generates ./demo_assets/
+uv run python render.py example.yaml --preview
+```
+
+Produces `demo_preview.mp4` — six placeholder clips covering `focus_in`,
+`ken_burns`, `vignette`, `film_grain`, `fade_out`, plus the `camera_viewfinder`
+overlay. No audio. ~15s.
+
+`example_full.yaml` is a richer reference covering audio tracks, vertical
+image modes, shutter-synced flicker sequences, and video clips with start
+offsets — it references private media and is not directly runnable.
+
 ## YAML reference
 
 ### Top-level
