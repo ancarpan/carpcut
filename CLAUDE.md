@@ -127,12 +127,24 @@ Per-file paths: absolute → used as-is; relative → joined to `basedir`.
 
 All three overlays are alpha PNGs generated at runtime at the target resolution and composited via `overlay=0:0`. No external asset files required.
 
-## Fixed output params
+## Output params
+
+Default (master) profile:
 
 - Resolution: **1920×1080**
 - FPS: **25**
 - Video codec: **libx264**, CRF 18, preset fast
 - Audio codec: **AAC 192k**
+
+Profiles are defined in the `PROFILES` dict in `render.py` and applied over the `RENDER` dict by CLI flags (mutually exclusive); output filename gets a `_<profile>` suffix:
+
+| Flag | Resolution / FPS | Encode |
+|---|---|---|
+| `--preview` | 960×540 @ 10 | ultrafast, CRF 28, AAC 128k |
+| `--mobile` | 1280×720 @ 25 | medium, CRF 24, AAC 128k |
+
+All outputs use `-movflags +faststart`. To add a profile: add an entry to `PROFILES`, a flag in `main()`, and a row here.
+
 - Photos scaled with `force_original_aspect_ratio=decrease` + black padding
 
 ## How to add a new effect
@@ -164,7 +176,9 @@ Min tested versions: Python 3.9, FFmpeg 6.x, Pillow 9.x.
 ## Run
 
 ```bash
-uv run python render.py film.yaml
+uv run python render.py film.yaml            # 1080p master
+uv run python render.py film.yaml --mobile   # 720p, small file for sharing
+uv run python render.py film.yaml --preview  # 540p @ 10fps, fast iteration
 ```
 
 `uv run` auto-resolves the project venv — no manual `source .venv/bin/activate` needed.

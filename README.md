@@ -16,7 +16,18 @@ uv sync
 ```bash
 uv run python render.py film.yaml
 uv run python render.py film.yaml --preview   # 960x540 @ 10fps, fast iteration
+uv run python render.py film.yaml --mobile    # 1280x720 @ 25fps, small file for sharing
 ```
+
+| flag | output | resolution / fps | quality |
+|---|---|---|---|
+| *(none)* | `<output>` | 1920x1080 @ 25 | CRF 18, 192k audio (master) |
+| `--mobile` / `-m` | `<output>_mobile.mp4` | 1280x720 @ 25 | CRF 24, 128k audio, `faststart` |
+| `--preview` / `-p` | `<output>_preview.mp4` | 960x540 @ 10 | CRF 28, ultrafast |
+
+`--mobile` is roughly 20x smaller than the master on the demo and suited to
+messaging apps; it is rendered natively at 720p rather than re-encoded from
+the master. `--preview` and `--mobile` are mutually exclusive.
 
 ## Try the demo
 

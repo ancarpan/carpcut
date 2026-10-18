@@ -16,7 +16,7 @@ import shutil
 from pathlib import Path
 
 # ─────────────────────────────────────────────
-# RENDER PROFILE (mutated by --preview)
+# RENDER PROFILE (mutated by --preview / --mobile)
 # ─────────────────────────────────────────────
 
 RENDER = {
@@ -26,6 +26,14 @@ RENDER = {
     'preset': 'fast',
     'crf': 18,
     'audio_bitrate': '192k',
+}
+
+# Named profiles applied over RENDER by the CLI flags.
+PROFILES = {
+    'preview': dict(w=960, h=540, fps=10,
+                    preset='ultrafast', crf=28, audio_bitrate='128k'),
+    'mobile': dict(w=1280, h=720, fps=25,
+                   preset='medium', crf=24, audio_bitrate='128k'),
 }
 
 # ─────────────────────────────────────────────
@@ -646,6 +654,7 @@ def concatenate_segments(segments, output, audio_tracks=None, total_duration=Non
         '-f', 'concat', '-safe', '0',
         '-i', concat_list,
         '-c:v', 'libx264', '-preset', RENDER['preset'], '-crf', str(RENDER['crf']),
+        '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
         tmp_video
     ]
     print("\n→ Concatenating segments...")
@@ -724,6 +733,7 @@ def concatenate_segments(segments, output, audio_tracks=None, total_duration=Non
         ['-filter_complex', ';'.join(filter_parts),
          '-map', '0:v', '-map', '[aout]',
          '-c:v', 'copy', '-c:a', 'aac', '-b:a', RENDER['audio_bitrate'],
+         '-movflags', '+faststart',
          '-shortest', output]
     )
     result = subprocess.run(cmd_audio, capture_output=True, text=True)
@@ -839,14 +849,22 @@ def resolve_clip_duration(clip):
 def main():
     ap = argparse.ArgumentParser(description="CarpCut renderer")
     ap.add_argument('yaml', help="path to film YAML")
-    ap.add_argument('-p', '--preview', action='store_true',
-                    help="fast iteration: 960x540 @ 10fps, preset=ultrafast, crf=28")
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument('-p', '--preview', action='store_true',
+                      help="fast iteration: 960x540 @ 10fps, preset=ultrafast, crf=28")
+    mode.add_argument('-m', '--mobile', action='store_true',
+                      help="small shareable file: 1280x720 @ 25fps, crf=24, 128k audio")
     args = ap.parse_args()
 
+    suffix = None
     if args.preview:
-        RENDER.update(w=960, h=540, fps=10,
-                      preset='ultrafast', crf=28, audio_bitrate='128k')
+        RENDER.update(PROFILES['preview'])
+        suffix = 'preview'
         print("⚡ PREVIEW mode: 960x540 @ 10fps, ultrafast/crf28")
+    elif args.mobile:
+        RENDER.update(PROFILES['mobile'])
+        suffix = 'mobile'
+        print("📱 MOBILE mode: 1280x720 @ 25fps, medium/crf24")
 
     yaml_path = Path(args.yaml).resolve()
     with open(yaml_path, 'r') as f:
@@ -865,9 +883,9 @@ def main():
     print(f"   Basedir: {basedir}")
 
     output = config.get('output', 'output.mp4')
-    if args.preview:
+    if suffix:
         op = Path(output)
-        output = str(op.with_name(f"{op.stem}_preview{op.suffix}"))
+        output = str(op.with_name(f"{op.stem}_{suffix}{op.suffix}"))
     audio_tracks = config.get('audio', []) or []
     for a in audio_tracks:
         a['file'] = resolve_path(a.get('file'), basedir)
